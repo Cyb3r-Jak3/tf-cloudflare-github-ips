@@ -66,6 +66,7 @@ jobs:
       continue-on-error: true
       env:
         TF_VAR_onepassword_token: ${{ secrets.TF_VAR_ONEPASSWORD_TOKEN }}
+        TF_VAR_account_id: ${{ secrets.TF_VAR_ACCOUNT_ID }}
 
     - name: Parse Plan
       id: parse-plan
@@ -139,6 +140,7 @@ jobs:
           fi
         env:
           TF_VAR_onepassword_token: ${{ secrets.TF_VAR_ONEPASSWORD_TOKEN }}
+          TF_VAR_account_id: ${{ secrets.TF_VAR_ACCOUNT_ID }}
 
       - name: Output Apply Results to Summary
         run: |
