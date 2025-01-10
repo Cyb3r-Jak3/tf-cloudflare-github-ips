@@ -33,10 +33,6 @@ provider "cloudflare" {
   api_key = data.onepassword_item.cloudflare_creds.password
 }
 
-variable "onepassword_token" {
-  type = string
-}
-
 provider "onepassword" {
   token = var.onepassword_token
   url   = "https://connect.k8s.jwhite.network"

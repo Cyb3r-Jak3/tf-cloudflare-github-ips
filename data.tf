@@ -7,8 +7,4 @@ data "onepassword_item" "cloudflare_creds" {
   title = "Cloudflare Global Creds"
 }
 
-data "cloudflare_accounts" "mvp_account" {
-  name = var.account_name
-}
-
 data "github_ip_ranges" "ips" {}
