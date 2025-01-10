@@ -1,0 +1,143 @@
+name: 'Apply'
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */4 * * *'
+
+
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TOFU_VERSION: 1.8.8
+
+permissions:
+  contents: read
+   
+jobs:
+  plan:
+    name: 'Tofu Plan'
+    runs-on: cyb3r-jak3-tf-cloudflare-github-ips 
+    outputs:
+      tfplanExitCode: ${{ steps.plan.outputs.exitcode }}
+
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+
+    - name: Setup OpenTofu
+      uses: opentofu/setup-opentofu@v1
+      with:
+        tofu_version: ${{ env.TOFU_VERSION }}
+
+    - name: Setup AWS Auth from Secrets
+      run: |
+        aws configure set region us-east-1 --profile r2-terraform-states
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile r2-terraform-states
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile r2-terraform-states
+
+    - name: Configure plugin cache
+      run: |
+        echo "TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache" >>"$GITHUB_ENV"
+        mkdir --parents "$HOME/.terraform.d/plugin-cache"
+
+    - name: Cache Provider Plugins
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.terraform.d/plugin-cache
+        key: terraform-${{ runner.os }}-${{ hashFiles('**/.terraform.lock.hcl') }}
+        restore-keys: |
+          terraform-${{ runner.os }}-
+
+    - name: OpenTofu Init
+      run: tofu init
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: OpenTofu Plan
+      id: plan
+      run:  tofu plan -no-color -detailed-exitcode -input=false -out plan.tfplan
+      continue-on-error: true
+      env:
+        TF_VAR_onepassword_token: ${{ secrets.TF_VAR_ONEPASSWORD_TOKEN }}
+
+    - name: Parse Plan
+      id: parse-plan
+      run: |
+          echo "~~~ $(tofu show -no-color ./plan.tfplan) ~~~" >> $GITHUB_STEP_SUMMARY
+          echo "plan<<EOF" >> $GITHUB_OUTPUT
+          echo "$(tofu show -no-color ./plan.tfplan)" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Upload Plan
+      id: upload-plan
+      if: (steps.plan.outputs.exitcode == 2)
+      uses: actions/upload-artifact@v4
+      with:
+        name: TofuPlan
+        path: plan.tfplan
+
+  apply:
+    name: Tofu Apply
+    runs-on: cyb3r-jak3-tf-cloudflare-github-ips
+    needs: [plan]
+    environment:
+      name: tf-apply
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Tofu plan
+        uses: actions/download-artifact@v4
+        with:
+          name: TofuPlan
+          path: plan.tfplan
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: ${{ env.TOFU_VERSION }}
+    
+      - name: Setup AWS Auth from Secrets
+        run: |
+          aws configure set region us-east-1 --profile r2-terraform-states
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile r2-terraform-states
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile r2-terraform-states
+
+      - name: Configure plugin cache
+        run: |
+          echo "TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache" >>"$GITHUB_ENV"
+          mkdir --parents "$HOME/.terraform.d/plugin-cache"
+    
+      - name: Cache Provider Plugins
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.terraform.d/plugin-cache
+          key: terraform-${{ runner.os }}-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: |
+            terraform-${{ runner.os }}-
+
+      - name: Tofu Apply
+        run: |
+          set -o pipefail
+          tofu init
+          tofu apply -input=false -no-color plan.tfplan/plan.tfplan | tee apply.txt
+          export tf_exitcode=$?
+          echo "tf_exitcode=$tf_exitcode" >> $GITHUB_OUTPUT
+
+          if [[ $tf_exitcode -eq 0 ]]; then
+            exit 0
+          else
+            exit $tf_exitcode
+          fi
+        env:
+          TF_VAR_onepassword_token: ${{ secrets.TF_VAR_ONEPASSWORD_TOKEN }}
+
+      - name: Output Apply Results to Summary
+        run: |
+          echo "~~~ $(cat apply.txt) ~~~" >> $GITHUB_STEP_SUMMARY
