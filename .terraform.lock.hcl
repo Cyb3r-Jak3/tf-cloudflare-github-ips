@@ -29,6 +29,7 @@ provider "registry.opentofu.org/cloudflare/cloudflare" {
   version     = "4.43.0"
   constraints = "4.43.0"
   hashes = [
+    "h1:l5NKJUOQJ1mHl1eekeXaxUZ+g+8Yv4aGcIN9vuK6GL4=",
     "h1:sNbvm66/2vc8B/khyioOO8eNaU8nb89x693AN7fQheU=",
     "zh:006d111d6eafe6eeb5df2f91bd0ca320f979bd71f8cd8c475f10b2bd94acba55",
     "zh:031fbb5cac23a841dc18e270cbfcd3ce9f4ba504edbd3c78931f7ed9827220a8",
