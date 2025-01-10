@@ -21,21 +21,11 @@ terraform {
       source  = "integrations/github"
       version = "6.4.0"
     }
-    onepassword = {
-      source  = "1Password/onepassword"
-      version = "2.1.2"
-    }
   }
 }
 
 provider "cloudflare" {
-  email   = data.onepassword_item.cloudflare_creds.username
-  api_key = data.onepassword_item.cloudflare_creds.password
-}
-
-provider "onepassword" {
-  token = var.onepassword_token
-  url   = "https://connect.k8s.jwhite.network"
+  api_token = var.cloudflare_api_token
 }
 
 resource "cloudflare_list" "github_actions_ips" {

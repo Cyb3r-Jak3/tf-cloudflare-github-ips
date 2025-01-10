@@ -2,6 +2,6 @@ variable "account_id" {
   type = string
 }
 
-variable "onepassword_token" {
+variable "cloudflare_api_token" {
   type = string
 }
