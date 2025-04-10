@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  TOFU_VERSION: 1.8.8
+  TOFU_VERSION: 1.9.0
 
 permissions:
   contents: read
@@ -20,7 +20,7 @@ permissions:
 jobs:
   plan:
     name: 'Tofu Plan'
-    runs-on: ubuntu-latest
+    runs-on: cyb3r-jak3-tf-cloudflare-github-ips
     outputs:
       tfplanExitCode: ${{ steps.plan.outputs.exitcode }}
 
@@ -42,7 +42,7 @@ jobs:
     - name: Configure plugin cache
       run: |
         echo "TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache" >>"$GITHUB_ENV"
-        mkdir --parents "$HOME/.terraform.d/plugin-cache"
+        mkdir --parents "$TF_PLUGIN_CACHE_DIR"
 
     - name: Cache Provider Plugins
       uses: actions/cache@v4
@@ -114,7 +114,7 @@ jobs:
       - name: Configure plugin cache
         run: |
           echo "TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache" >>"$GITHUB_ENV"
-          mkdir --parents "$HOME/.terraform.d/plugin-cache"
+          mkdir --parents "$TF_PLUGIN_CACHE_DIR"
     
       - name: Cache Provider Plugins
         uses: actions/cache@v4
