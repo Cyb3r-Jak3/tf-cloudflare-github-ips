@@ -9,14 +9,14 @@ This exists separately from the main project due to issues with Cloudflare Terra
 | Name | Version |
 |------|---------|
 | <a name="requirement_cloudflare"></a> [cloudflare](#requirement\_cloudflare) | 4.43.0 |
-| <a name="requirement_github"></a> [github](#requirement\_github) | 6.4.0 |
+| <a name="requirement_github"></a> [github](#requirement\_github) | <7 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_cloudflare"></a> [cloudflare](#provider\_cloudflare) | 4.43.0 |
-| <a name="provider_github"></a> [github](#provider\_github) | 6.4.0 |
+| <a name="provider_github"></a> [github](#provider\_github) | 6.6.0 |
 
 ## Modules
 
@@ -27,7 +27,7 @@ No modules.
 | Name | Type |
 |------|------|
 | [cloudflare_list.github_actions_ips](https://registry.terraform.io/providers/cloudflare/cloudflare/4.43.0/docs/resources/list) | resource |
-| [github_ip_ranges.ips](https://registry.terraform.io/providers/integrations/github/6.4.0/docs/data-sources/ip_ranges) | data source |
+| [github_ip_ranges.ips](https://registry.terraform.io/providers/integrations/github/latest/docs/data-sources/ip_ranges) | data source |
 
 ## Inputs
 
