@@ -20,7 +20,9 @@ permissions:
 jobs:
   plan:
     name: 'Tofu Plan'
-    runs-on: cyb3r-jak3-tf-cloudflare-github-ips
+    # Needs a custom image with awscli and OpenTofu installed
+    # runs-on: cyb3r-jak3-tf-cloudflare-github-ips
+    runs-on: ubuntu-latest
     outputs:
       tfplanExitCode: ${{ steps.plan.outputs.exitcode }}
 
