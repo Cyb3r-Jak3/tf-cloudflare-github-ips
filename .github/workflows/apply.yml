@@ -21,8 +21,8 @@ jobs:
   plan:
     name: 'Tofu Plan'
     # Needs a custom image with awscli and OpenTofu installed
-    runs-on: cyb3r-jak3-tf-cloudflare-github-ips
-    # runs-on: ubuntu-latest
+    # runs-on: cyb3r-jak3-tf-cloudflare-github-ips
+    runs-on: ubuntu-latest
     outputs:
       tfplanExitCode: ${{ steps.plan.outputs.exitcode }}
 
@@ -89,7 +89,8 @@ jobs:
 
   apply:
     name: Tofu Apply
-    runs-on: cyb3r-jak3-tf-cloudflare-github-ips
+    # runs-on: cyb3r-jak3-tf-cloudflare-github-ips
+    runs-on: ubuntu-latest
     needs: [plan]
     environment:
       name: tf-apply
