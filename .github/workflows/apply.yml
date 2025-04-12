@@ -21,8 +21,8 @@ jobs:
   plan:
     name: 'Tofu Plan'
     # Needs a custom image with awscli and OpenTofu installed
-    # runs-on: cyb3r-jak3-tf-cloudflare-github-ips
-    runs-on: ubuntu-latest
+    runs-on: cyb3r-jak3-tf-cloudflare-github-ips
+    # runs-on: ubuntu-latest
     outputs:
       tfplanExitCode: ${{ steps.plan.outputs.exitcode }}
 
@@ -43,7 +43,7 @@ jobs:
 
     - name: Configure plugin cache
       run: |
-        echo "TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache" >>"$GITHUB_ENV"
+        echo "TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache" >> "$GITHUB_ENV"
         mkdir --parents "$TF_PLUGIN_CACHE_DIR"
 
     - name: Cache Provider Plugins
