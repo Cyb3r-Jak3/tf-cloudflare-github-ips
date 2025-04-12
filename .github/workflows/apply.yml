@@ -35,19 +35,16 @@ jobs:
       with:
         tofu_version: ${{ env.TOFU_VERSION }}
 
-    - id: install-aws-cli
-      uses: unfor19/install-aws-cli-action@v1
-
     - name: Setup AWS Auth from Secrets
       run: |
-        aws configure set region us-east-1 --profile r2-terraform-states
-        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile r2-terraform-states
-        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile r2-terraform-states
+        /usr/local/bin/aws configure set region us-east-1 --profile r2-terraform-states
+        /usr/local/bin/aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile r2-terraform-states
+        /usr/local/bin/aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile r2-terraform-states
 
     - name: Configure plugin cache
       run: |
-        echo "TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache" >> "$GITHUB_ENV"
-        mkdir --parents "$TF_PLUGIN_CACHE_DIR"
+        echo "TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache" >>"$GITHUB_ENV"
+        mkdir --parents "$HOME/.terraform.d/plugin-cache"
 
     - name: Cache Provider Plugins
       uses: actions/cache@v4
@@ -92,7 +89,7 @@ jobs:
 
   apply:
     name: Tofu Apply
-    runs-on: ubuntu-latest
+    runs-on: cyb3r-jak3-tf-cloudflare-github-ips
     needs: [plan]
     environment:
       name: tf-apply
@@ -109,17 +106,17 @@ jobs:
         uses: opentofu/setup-opentofu@v1
         with:
           tofu_version: ${{ env.TOFU_VERSION }}
-    
+
       - name: Setup AWS Auth from Secrets
         run: |
-          aws configure set region us-east-1 --profile r2-terraform-states
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile r2-terraform-states
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile r2-terraform-states
+          /usr/local/bin/aws configure set region us-east-1 --profile r2-terraform-states
+          /usr/local/bin/aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile r2-terraform-states
+          /usr/local/bin/aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile r2-terraform-states
 
       - name: Configure plugin cache
         run: |
           echo "TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache" >>"$GITHUB_ENV"
-          mkdir --parents "$TF_PLUGIN_CACHE_DIR"
+          mkdir --parents "$HOME/.terraform.d/plugin-cache"
     
       - name: Cache Provider Plugins
         uses: actions/cache@v4
