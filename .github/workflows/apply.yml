@@ -35,6 +35,9 @@ jobs:
       with:
         tofu_version: ${{ env.TOFU_VERSION }}
 
+    - id: install-aws-cli
+      uses: unfor19/install-aws-cli-action@v1
+
     - name: Setup AWS Auth from Secrets
       run: |
         aws configure set region us-east-1 --profile r2-terraform-states
