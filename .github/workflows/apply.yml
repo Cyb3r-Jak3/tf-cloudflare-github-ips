@@ -68,19 +68,11 @@ jobs:
 
     - name: OpenTofu Plan
       id: plan
-      run:  tofu plan -no-color -detailed-exitcode -input=false -out plan.tfplan
+      run: tofu plan -no-color -detailed-exitcode -input=false -out plan.tfplan
       continue-on-error: true
       env:
         TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         TF_VAR_account_id: ${{ secrets.TF_VAR_ACCOUNT_ID }}
-
-    - name: Parse Plan
-      id: parse-plan
-      run: |
-          echo "~~~ $(tofu show -no-color ./plan.tfplan) ~~~" >> $GITHUB_STEP_SUMMARY
-          echo "plan<<EOF" >> $GITHUB_OUTPUT
-          echo "$(tofu show -no-color ./plan.tfplan)" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
 
     - name: Upload Plan
       id: upload-plan
@@ -93,6 +85,7 @@ jobs:
   apply:
     name: Tofu Apply
     runs-on: cyb3r-jak3-tf-cloudflare-github-ips
+    if: ${{ needs.plan.outputs.tfplanExitCode == 2 }}
     needs: [plan]
     environment:
       name: tf-apply
