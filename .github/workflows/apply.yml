@@ -62,14 +62,30 @@ jobs:
       run: |
         tofu init
         tofu -version
+        tofu validate -no-color
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     - name: OpenTofu Plan
       id: plan
-      run: tofu plan -no-color -detailed-exitcode -input=false -out plan.tfplan
-      continue-on-error: true
+      run: |
+        tofu plan -no-color -detailed-exitcode -input=false -out plan.tfplan || tf_exitcode=$?
+        echo "tf_exitcode=$tf_exitcode" >> $GITHUB_OUTPUT
+        if [[ $tf_exitcode -eq 0 ]]; then
+          echo "No changes to be applied."
+          exit 0
+        elif [[ $tf_exitcode -eq 1 ]]; then
+          echo "Error in plan."
+          exit 1
+        elif [[ $tf_exitcode -eq 2 ]]; then
+          echo "Changes to be applied."
+          exit 0
+        else
+          echo "Unknown error."
+          exit 1
+        fi
+
       env:
         TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         TF_VAR_account_id: ${{ secrets.TF_VAR_ACCOUNT_ID }}
