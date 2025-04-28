@@ -29,15 +29,6 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v4
 
-    # - id: install-aws-cli
-    #   uses: unfor19/install-aws-cli-action@v1
-
-    - name: Setup OpenTofu
-      uses: opentofu/setup-opentofu@v1
-      with:
-        tofu_version: ${{ env.TOFU_VERSION }}
-        tofu_wrapper: false
-
     - name: Setup AWS Auth from Secrets
       run: |
         aws configure set region us-east-1 --profile r2-terraform-states
@@ -60,6 +51,7 @@ jobs:
 
     - name: OpenTofu Init
       run: |
+        tofuenv install
         tofu init
         tofu -version
         tofu validate -no-color
@@ -114,11 +106,11 @@ jobs:
           name: TofuPlan
           path: plan.tfplan
 
-      - name: Setup OpenTofu
-        uses: opentofu/setup-opentofu@v1
-        with:
-          tofu_version: ${{ env.TOFU_VERSION }}
-          tofu_wrapper: false
+      # - name: Setup OpenTofu
+      #   uses: opentofu/setup-opentofu@v1
+      #   with:
+      #     tofu_version: ${{ env.TOFU_VERSION }}
+      #     tofu_wrapper: false
 
       # - id: install-aws-cli
       #   uses: unfor19/install-aws-cli-action@v1
@@ -145,6 +137,9 @@ jobs:
 
       - name: Tofu Apply
         run: |
+            - name: OpenTofu Init
+      run: |
+          tofuenv install
           set -o pipefail
           tofu init
           tofu apply -input=false -no-color plan.tfplan/plan.tfplan | tee apply.txt
