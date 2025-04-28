@@ -137,8 +137,6 @@ jobs:
 
       - name: Tofu Apply
         run: |
-            - name: OpenTofu Init
-      run: |
           tofuenv install
           set -o pipefail
           tofu init
