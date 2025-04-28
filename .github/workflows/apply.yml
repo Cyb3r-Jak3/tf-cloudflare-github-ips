@@ -120,8 +120,8 @@ jobs:
           tofu_version: ${{ env.TOFU_VERSION }}
           tofu_wrapper: false
 
-      - id: install-aws-cli
-        uses: unfor19/install-aws-cli-action@v1
+      # - id: install-aws-cli
+      #   uses: unfor19/install-aws-cli-action@v1
 
       - name: Setup AWS Auth from Secrets
         run: |
