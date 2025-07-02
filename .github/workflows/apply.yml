@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  TOFU_VERSION: 1.9.0
+  TOFU_VERSION: 1.10.1
 
 permissions:
   contents: read
@@ -28,9 +28,6 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
-
-    - id: install-aws-cli
-      uses: unfor19/install-aws-cli-action@v1
 
     - name: Setup OpenTofu
       uses: opentofu/setup-opentofu@v1
